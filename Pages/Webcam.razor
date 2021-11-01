@@ -1,0 +1,38 @@
+﻿@page "/webcam"
+
+@using OpenCvSharp;
+
+
+<img src="@_imgSrc" alt="@_mensagemErro" />
+
+@code {
+    private string _imgSrc;
+    private string _mensagemErro;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var capture = new VideoCapture(0))
+        using (var frame = new Mat())
+        {
+            try
+            {
+                while (true)
+                {
+                    capture.Read(frame);
+
+                    var base64 = Convert.ToBase64String(frame.ToBytes());
+                    _imgSrc = $"data:image/gif;base64,{base64}";
+
+                    await Task.Delay(1);
+
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                _mensagemErro = ex.Message;
+            }
+
+        }
+    }
+}
